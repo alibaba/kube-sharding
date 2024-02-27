@@ -18,7 +18,7 @@ kube-sharding是一个业务编排controller，编排对象是需要加载大规
 
 1. 没有直接调度pod资源，而是调度了一个抽象的replica资源，这样实现非常有利于调度能力的扩展：
    1. 对于搜推引擎来说，replica里包括了pod和引擎的索引数据，可以分别发布pod或者索引，从而轻量化的实现索引数据的发布。
-   2. 对于普通单列大模型来说，索引数据变成了LoRA和模型，c2可以单独发布LoRA，从而轻松实现大模型的微调，详见：[大模型推理框架RTP-LLM对LoRA的支持](https://mp.weixin.qq.com/s/em-mnps_Oqe1PLLpJ9hB-A)。
+   2. 对于普通单列大模型来说，索引数据变成了LoRA和模型，c2可以单独发布LoRA，从而轻松实现大模型的微调。
    3. 对于分布式推理，replica又可以实现为包含多列的业务的gang replica，这一点后续会详细介绍。
 2. rollingset没有通过ReplicaSet的方式来控制具体replica的版本，而是通过一套算法直接输出其管理的所有replica的版本。这样实现有助于replica的抽象，以及原地升级的实现。由于gpu资源紧张，以及模型下载慢导致启动慢，原地升级是十分有必要的，c2 rollingset在发布业务过程中可以支持：索引/模型/LoRA等业务数据变更，image/command/args等容器层变更，以及cpu/gpu/mem等资源变更在内的几乎全变部更场景的原地升级，助力业务平滑发布。
 #### **kube-sharding对于普通的单列无状态业务的发布过程**
