@@ -1,0 +1,49 @@
+
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin
+logs*
+test.sh
+
+# Test binary, build with `go test -c`
+*.test
+
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+target
+
+# Kubernetes Generated files - skip generated files, except for vendored files
+!vendor/**/zz_generated.*
+
+# editor and IDE paraphernalia
+.idea
+*.swp
+*.swo
+*~
+
+.vscode*
+
+.DS_Store
+controller/.DS_Store
+coverage.data
+coverage.html
+coverage.txt
+*coverprofile
+*tag.html
+*/__carbon_record_dir__/*
+*carbon_record_dir*
+test.cov
+vendor*
+*log
+logs
+proxy/httph/history/
+log
+stderr.rep
+tools/schedule_timeline.log
+*.tar.gz
+

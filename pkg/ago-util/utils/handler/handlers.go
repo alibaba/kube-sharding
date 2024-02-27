@@ -1,0 +1,45 @@
+/*
+Copyright 2024 The Alibaba Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+package handler
+
+import (
+	"net/http"
+
+	"github.com/alibaba/kube-sharding/pkg/ago-util/utils"
+)
+
+// QPSLimiteHandler a http handler which can limits qps
+type QPSLimiteHandler struct {
+	impl *utils.FreqLimiter
+}
+
+// NewQPSLimiteHandler creates a new handler.
+func NewQPSLimiteHandler(maxQPS int32) *QPSLimiteHandler {
+	return &QPSLimiteHandler{impl: utils.NewFreqLimiter(maxQPS)}
+}
+
+// HandleFunc creates a http handler
+func (ql *QPSLimiteHandler) HandleFunc(errHandler func(w http.ResponseWriter, r *http.Request),
+	target func(w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if !ql.impl.Run(func() {
+			target(w, r)
+		}) {
+			errHandler(w, r)
+		}
+	}
+}

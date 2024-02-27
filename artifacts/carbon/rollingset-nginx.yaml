@@ -1,0 +1,55 @@
+apiVersion: carbon.taobao.com/v1
+kind: RollingSet
+metadata:
+  name: rs-nginx
+  annotations:
+    note: This is a test annotation
+  labels:
+    app.hippo.io/app-name: app_test0
+    app.hippo.io/cluster-name: hippo_7u
+    app.hippo.io/exclusive-labels: port-tcp-8099
+    app.hippo.io/maxInstancePerNode: '4000'
+
+spec:
+  replicas: 2
+  latestVersionRatio: 100
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 100%
+      maxSurge: 0%
+  healthCheckerConfig:
+    type: Lv7Health
+    lv7Config:
+      path: /
+      port: 8080
+      lostCountThreshold: 6
+  template:
+    metadata:
+      labels:
+        app: rs-nginx
+    spec:
+        containers:
+          - image: nginx
+            imagePullPolicy: IfNotPresent
+            name: rs-nginx-pod
+            ports:
+              - containerPort: 8080
+                protocol: TCP
+            resources:
+                limits: 
+                    cpu: 20m
+                    memory: 128Mi
+            securityContext:
+              capabilities: {}
+              privileged: false
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        enableServiceLinks: true
+        priority: 0
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: default
+        serviceAccountName: default
+        terminationGracePeriodSeconds: 300

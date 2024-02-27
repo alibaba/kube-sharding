@@ -1,0 +1,36 @@
+[
+{
+    "resource": "rollingsets",
+    "kind": "RollingSet",
+    "source": "kube",
+    "destination": "nop",
+    "metas": {
+        "selectors": {
+            "rs-version-hash": "test-prepub1"
+        }
+    }
+},
+{
+    "resource": "workernodes",
+    "kind": "WorkerNode",
+    "source": "kube",
+    "destination": "mem",
+    "metas": {
+        "config": {
+            "owner-label": "rs-version-hash"
+        }
+    }
+},
+{
+    "resource": "pods",
+    "kind": "Pod",
+    "source": "kube",
+    "destination": "kube",
+    "groupVersion": "v1",
+    "metas": {
+        "config": {
+            "owner-label": "worker-version-hash"
+        }
+    }
+}
+]

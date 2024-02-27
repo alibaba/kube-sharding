@@ -1,0 +1,209 @@
+syntax = "proto3";
+
+package carbon;
+
+
+message WorkerNode {
+  string kind = 1;
+  string apiVersion = 2;
+  Metadata metadata = 3;
+  Spec spec = 4;
+  Status status = 5;
+}
+
+message OwnerReferences {
+  string apiVersion = 1;
+  string kind = 2;
+  string  name = 3;
+  string  uid = 4;
+  bool controller = 5;
+  bool blockOwnerDeletion = 6;
+}
+
+message Metadata {
+  string name = 1;
+  string namespace = 2;
+  string uid = 3;
+  string resourceVersion = 4;
+  string creationTimestamp = 5;
+  map<string, string> labels = 6;
+  map<string, string> annotations = 7;
+  repeated OwnerReferences ownerReferences = 8;
+}
+
+message Selector {
+  map<string, string> matchLabels = 1;
+}
+
+
+
+message Spec{
+  Selector selector = 1;
+  string resVersion = 2;
+  string version = 3;
+  string shardGroupVersion = 4;
+  Template template = 5;
+  string signature = 6;
+  bool restartAfterResourceChange = 7;
+  int32 resourceMatchTimeout = 8;
+  int32 processMatchTimeout = 9;
+  map<string, int32> brokenRecoverQuotaConfig = 10;
+  string recoverStrategy = 11;
+  string compressedCustomInfo = 12;
+  string userDefVersion = 13;
+  bool online = 14;
+  bool updatingGracefully = 15;
+  int64  updatePlanTimestamp = 16;
+  string workerMode = 17;
+  bool dependencyReady = 18;
+  bool  toDelete = 19;
+  bool releasing = 20;
+  bool reclaim = 21;
+  int32 ownerGeneration = 22;
+}
+
+message Status{
+  string ip = 1;
+  string hostIP = 2;
+  bool resourceMatch = 3;
+  bool processMatch = 4;
+  string resVersion = 5;
+  string version = 6;
+  string userDefVersion = 7;
+  int32 processScore = 8;
+  string phase = 9;
+  string packageStatus = 10;
+  bool reclaim = 11;
+  bool internalReclaim = 12;
+  bool workerReady = 13;
+  bool namingRegisteredReady = 14;
+  string entityName = 15;
+  bool entityAlloced = 16;
+  string resourcePool = 17;
+  string workerMode = 18;
+  bool serviceOffline = 19;
+  bool warmup = 20;
+  bool needWarmup = 21;
+  bool inUpdating = 22;
+  bool inRestarting = 23;
+  bool processReady = 24;
+  int64 score = 25;
+  string allocStatus = 26;
+  string healthStatus = 27;
+  string processStep = 28;
+  HealthCondition healthCondition = 29;
+  string serviceStatus = 30;
+  repeated ServiceConditions serviceConditions = 31;
+  string serviceReady = 32;
+  string serviceInfoMetas =33;
+  string lastUpdateStatusTime =34;
+  string becomeCurrentTime =35;
+  int64 assignedTime = 36;
+  int64 podReadyTime = 37;
+  int64 lastWorkerReadyTime = 38;
+  int64 lastServiceReadyTime = 39;
+  bool complete = 40;
+  bool toRelease = 41;
+  SlotId slotId = 42;
+
+}
+
+message SlotId {
+  string slave_address = 1;
+  int32 slot_id = 2;
+}
+
+message ServiceConditions{
+  string type = 1;
+  string serviceName = 2;
+  string status = 3;
+  int32  score = 4;
+  string lastTransitionTime = 5;
+}
+
+message HealthCondition{
+  string type = 1;
+  string status = 2;
+  string lastTransitionTime = 3;
+  string message = 4;
+  map<string, string> metas = 5;
+  bool checked = 6;
+  string version = 7;
+  string workerStatus = 8;
+
+}
+
+
+
+message Template {
+  TemplateMetadata metadata = 1;
+  TemplateSpec  spec = 2;
+
+}
+
+message TemplateMetadata{
+  string creationTimestamp = 1;
+  map<string, string> labels = 2;
+  map<string, string> annotations = 3;
+}
+message MatchExpressions{
+  string key = 1;
+  string operator = 2;
+  repeated string values = 3;
+}
+
+message NodeSelectorTerms{
+  repeated MatchExpressions matchExpressions = 1;
+}
+message RequiredDuringSchedulingIgnoredDuringExecution{
+  repeated NodeSelectorTerms nodeSelectorTerms = 1;
+}
+
+message NodeAffinity{
+  RequiredDuringSchedulingIgnoredDuringExecution requiredDuringSchedulingIgnoredDuringExecution = 1;
+}
+
+message TemplateSpecAffinity {
+  NodeAffinity nodeAffinity = 1;
+}
+
+message Env{
+  string name = 1;
+  string value = 2;
+}
+message Resources{
+  map<string, string> limits = 1;
+}
+message Configs {
+  int32 restartCountLimit = 1;
+  int32 stopGracePeriod = 2;
+  string MEM_WMARK_RATIO = 3;
+}
+
+message Containers{
+  string name = 1;
+  string image = 2;
+  repeated string command = 3;
+  repeated string args = 4;
+  repeated Env env = 5;
+  Resources resources = 6;
+  Configs configs = 7;
+  string alias = 8;
+}
+
+message PackageInfos{
+  string pacakgeType = 1;
+  string packageUri = 2;
+}
+
+message TemplateSpec{
+  string restartPolicy = 1;
+  int32 terminationGracePeriodSeconds = 2;
+  bool hostNetwork = 3;
+  bool shareProcessNamespace = 4;
+  TemplateSpecAffinity affinity = 5;
+  string schedulerName = 6;
+  int32 priority = 7;
+  repeated Containers containers = 8;
+  repeated PackageInfos packageInfos = 9;
+}

@@ -1,0 +1,172 @@
+package client
+
+import (
+	v1 "github.com/alibaba/kube-sharding/pkg/apis/carbon/v1"
+	"github.com/alibaba/kube-sharding/pkg/memkube/client"
+	"github.com/alibaba/kube-sharding/pkg/memkube/mem"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/tools/cache"
+)
+
+// Client is a generic client to visit mem objects.
+type Client interface {
+	Create(kind string, object runtime.Object) error
+	List(kind string, opts metav1.ListOptions, into runtime.Object) error
+	// TODO: more
+}
+
+// memWorkerNodes iml carbon.v1.WorkerNodeInterface.
+type memWorkerNodes struct {
+	client Client
+	ns     string
+}
+
+func (w *memWorkerNodes) List(opts metav1.ListOptions) ([]*v1.WorkerNode, error) {
+	var workerNodeList v1.WorkerNodeList
+	err := w.client.List("workernodes", opts, workerNodeList)
+	return workerNodeList.Items, err
+}
+
+func newMemWorkerNodes(client Client, ns string) *memWorkerNodes {
+	return &memWorkerNodes{client: client, ns: ns}
+}
+
+// LocalClient local impl.
+/*
+workerNodeIndexer := mem.NewIndexer()
+memclient := &memkube.LocalClient{}
+memclient.Register("workernodes", workerNodeIndexer)
+var workerNodeClient v1.WorkerNodeInterface
+workerNodeClient = carbon.memWorkerNodes{client: memclient}
+
+workerNodeVisitor := newWorkerNodeVisitor(workerNodeInformer, workerNodeClient)
+rpcservice.Register("workernodes", workerNodeVisitor)
+*/
+type LocalClient struct {
+	indexer mem.Indexer
+}
+
+// RemoteClient is a kind of Client, just like Locallient
+type RemoteClient interface {
+	Client
+}
+
+// All resources share the same remote client.
+type shardRemoteClient struct {
+}
+
+// Config config
+type Config struct {
+}
+
+/*
+	remoteClient := newRemoteClient()
+	workerNodeClient = carbon.memWorkerNodes{client: remoteClient}
+	workerNodeLister := workerNodeLister{api: workerNodeClient}
+	resourceManager := newResourceManager(workerNodeLister)
+*/
+type workerNodeLister struct {
+	api v1.WorkerNodeInterface
+}
+
+func (w *workerNodeLister) List(selector labels.Selector) (runtime.Object, error) {
+	workerNodes, err := w.api.List(metav1.ListOptions{Selector: selector.String})
+	return workerNodes, err
+}
+
+// NewRemoteClient new remote client
+func NewRemoteClient() RemoteClient {
+	return &shardRemoteClient{}
+}
+
+// EndpointResolver resolve server address.
+type EndpointResolver interface {
+	Resolve(namespace string, shardId int) (string, error)
+}
+
+type ConfigmapResolver struct {
+}
+
+type StaticResolver struct {
+}
+
+func (resolver *StaticResolver) Resolve(namespace string, shardId int) (string, error) {
+	return "1.2.3.4:80", nil
+}
+
+// NewShardRemoteClient new
+func NewShardRemoteClient(resolver EndpointResolver) *shardRemoteClient {
+}
+
+// RPC APIs
+// A kinds of client.Client
+// compare to restul.Client in client-go
+type ShardRemoteClient interface {
+}
+
+// compare to carbon.v1 CarbonV1Client
+type CarbonMemClient interface {
+	WorkerNodes(namespace string) WorkerNodeInterface
+}
+
+func NewCarbonMemClient(client client.Client) CarbonMemClient {
+
+}
+
+type carbonMemClient struct {
+	client client.Client
+}
+
+func NewClient(config) client.Client {
+
+}
+
+func (c *carbonMemClient) WorkerNodes(namespace string) WorkerNodeInterface {
+	return newWorkerNodes{shardClient}
+}
+
+type workerNodes struct {
+	client client.Client
+}
+
+type WorkerNodeInformer interface {
+	Informer() cache.SharedIndexInformer
+	Lister() v1.WorkerNodeLister
+}
+
+// Different from client-go
+func NewWorkerNodesInformer(client client.Client) WorkerNodeInformer {
+}
+
+// In Client.
+func NewWorkerNodesInformerClient(client client.Client) WorkerNodeInformer {
+	return &workerNodeInformerClient{}
+}
+
+// In server.
+type workerNodeInformer struct {
+}
+
+type workerNodeInformerClient struct {
+}
+
+func (w *workerNodeInformerClient) Informer() cache.SharedIndexInformer {
+	return nil
+}
+
+func (w *workerNodeInformerClient) Lister() WorkerNodeLister {
+	return &workerNodeListerClient{client}
+}
+
+// in server
+type workerNodeLister struct {
+}
+
+type workerNodeListerClient struct {
+}
+
+func (w *workerNodeListerClient) List(selector labels.Selector) ([]*WorkerNode, error) {
+	w.client.List(asListOptions(selector))
+}

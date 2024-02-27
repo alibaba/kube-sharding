@@ -1,0 +1,7 @@
+{
+    "access": {
+        "filename": "./logs/access.log",
+        "maxsize": 300,
+        "maxbackups": 20
+    }
+}
