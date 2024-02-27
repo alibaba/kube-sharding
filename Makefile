@@ -48,8 +48,7 @@ darwin:
 	${GOENV} GOOS=darwin go build ${LDFLAGS} -o ${PWD}/target/c2/memorize-darwin ${BUILD_DIR}/cmd/c2/memorize/memorize.go
 
 ut:
-	${GOENV} go test -cover -coverprofile test.cov ./...
-	go tool cover -func test.cov | tail -1
+	${GOENV} go test -v ./...
 
 vet:
 	${GOENV} go vet ./... 
