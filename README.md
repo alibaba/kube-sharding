@@ -19,6 +19,8 @@ git clone <http://github.com/alibaba/kube-sharding.git>
 
 此项目包括多个controller: shardgroup,rollingset,publisher,worker,healthchecker。 添加controller和crd(customer resource define)
 
+shardgroup 对齐发布rollingset，实现多列业务的对齐发布。
+
 rollingset 调度replica(基本调度单元)，实现原地rolling。
 
 worker 作为被rollingset调度的基本单元，封装具体资源申请/释放/recover/offline等功能。
