@@ -3,7 +3,7 @@
 ```
 cd $GOPATH/src/
 
-mkdir -p gitlab.alibaba-inc.com/kubeshard
+mkdir -p github.com/alibaba/kube-sharding
 
 cd github.com/alibaba/kube-sharding.git
 
@@ -19,15 +19,14 @@ git clone <http://github.com/alibaba/kube-sharding.git>
 
 此项目包括多个controller: shardgroup,rollingset,publisher,worker,healthchecker。 添加controller和crd(customer resource define)
 
-rollingset 参考carbon rollingset，调度replica(基本调度单元)，实现原地rolling。
+rollingset 调度replica(基本调度单元)，实现原地rolling。
 
-replica 参考carbon replicaNode，作为被rollingset调度的基本单元，封装具体资源申请/释放/recover/offline等功能。
+worker 作为被rollingset调度的基本单元，封装具体资源申请/释放/recover/offline等功能。
 
 publisher 负责服务挂载。
 
 healthchecker 负责健康检查。
 
-captain/carbon/fiber等不同的调度器通过各自实现replica controller，实现各自调度replica的管理，并且共享rollingset controller。
 
 ## make
 
